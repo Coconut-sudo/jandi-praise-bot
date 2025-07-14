@@ -1,3 +1,5 @@
+# Updated index.js content with logging and response confirmation
+updated_index_js_with_logging = """\
 const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios');
@@ -33,13 +35,16 @@ function clearPraises() {
 app.post('/jandi-webhook', async (req, res) => {
   const data = req.body;
 
+  console.log('📩 收到來自 JANDI 的訊息：', JSON.stringify(data, null, 2));
+
   if (!data || !data.content || !data.sender || data.sender.id === data.bot?.id) {
     return res.sendStatus(200);
   }
 
   const praiseText = data.content.trim();
   savePraise(praiseText);
-  res.status(200).send('Praise received and stored.');
+
+  res.status(200).send('收到讚美了，小天使已收藏 ✨');
 });
 
 // Cron job: Every day at 8:00 AM Taiwan time (GMT+8)
@@ -47,8 +52,8 @@ cron.schedule('0 0 0 * * *', async () => {
   const praises = loadPraises();
   if (praises.length === 0) return;
 
-  const combined = praises.map(p => `• ${p}`).join('\n');
-  const finalMessage = `🪽 匿名小天使的每日讚美時間到囉！\n\n${combined}`;
+  const combined = praises.map(p => `• ${p}`).join('\\n');
+  const finalMessage = `🪽 匿名小天使的每日讚美時間到囉！\\n\\n${combined}`;
 
   try {
     await axios.post(INCOMING_WEBHOOK_URL, { body: finalMessage });
@@ -71,8 +76,8 @@ app.get('/test-publish', async (req, res) => {
     return res.send('No praises to send.');
   }
 
-  const combined = praises.map(p => `• ${p}`).join('\n');
-  const finalMessage = `🪽 匿名小天使的每日讚美時間到囉！\n\n${combined}`;
+  const combined = praises.map(p => `• ${p}`).join('\\n');
+  const finalMessage = `🪽 匿名小天使的每日讚美時間到囉！\\n\\n${combined}`;
 
   try {
     await axios.post(INCOMING_WEBHOOK_URL, { body: finalMessage });
@@ -87,3 +92,11 @@ app.get('/test-publish', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`讚美小天使 listening on port ${PORT}`);
 });
+"""
+
+# Save to file and return path
+index_path = "/mnt/data/index.js"
+with open(index_path, "w", encoding="utf-8") as f:
+    f.write(updated_index_js_with_logging)
+
+index_path
