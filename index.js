@@ -1,5 +1,4 @@
 // Updated index.js content with logging and response confirmation
-updated_index_js_with_logging = """\
 const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios');
