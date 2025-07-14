@@ -65,6 +65,25 @@ app.get('/', (req, res) => {
   res.send('JANDI Praise Bot is running.');
 });
 
+app.get('/test-publish', async (req, res) => {
+  const praises = loadPraises();
+  if (praises.length === 0) {
+    return res.send('No praises to send.');
+  }
+
+  const combined = praises.map(p => `• ${p}`).join('\n');
+  const finalMessage = `🪽 匿名小天使的每日讚美時間到囉！\n\n${combined}`;
+
+  try {
+    await axios.post(INCOMING_WEBHOOK_URL, { body: finalMessage });
+    clearPraises();
+    res.send('Praises sent successfully!');
+  } catch (err) {
+    console.error('Manual send failed:', err);
+    res.status(500).send('Failed to send praises.');
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`讚美小天使 listening on port ${PORT}`);
 });
