@@ -47,12 +47,13 @@ app.post('/jandi-webhook', async (req, res) => {
 });
 
 // Cron job: Every day at 8:00 AM Taiwan time (GMT+8)
-cron.schedule('0 0 0 * * *', async () => {
+// Runs at minute 0, second 0 of hour 8 in Asia/Taipei timezone
+cron.schedule('0 0 8 * * *', async () => {
   const praises = loadPraises();
   if (praises.length === 0) return;
 
-  const combined = praises.map(p => `• ${p}`).join('\\n');
-  const finalMessage = `🪽 匿名小天使的每日讚美時間到囉！\\n\\n${combined}`;
+  const combined = praises.map(p => `• ${p}`).join('\n');
+  const finalMessage = `🪽 匿名小天使的每日讚美時間到囉！\n\n${combined}`;
 
   try {
     await axios.post(INCOMING_WEBHOOK_URL, { body: finalMessage });
@@ -75,8 +76,8 @@ app.get('/test-publish', async (req, res) => {
     return res.send('No praises to send.');
   }
 
-  const combined = praises.map(p => `• ${p}`).join('\\n');
-  const finalMessage = `🪽 匿名小天使的每日讚美時間到囉！\\n\\n${combined}`;
+  const combined = praises.map(p => `• ${p}`).join('\n');
+  const finalMessage = `🪽 匿名小天使的每日讚美時間到囉！\n\n${combined}`;
 
   try {
     await axios.post(INCOMING_WEBHOOK_URL, { body: finalMessage });
@@ -86,16 +87,8 @@ app.get('/test-publish', async (req, res) => {
     console.error('Manual send failed:', err);
     res.status(500).send('Failed to send praises.');
   }
-});
+  });
 
-app.listen(PORT, () => {
-  console.log(`讚美小天使 listening on port ${PORT}`);
-});
-"""
-
-# Save to file and return path
-index_path = "/mnt/data/index.js"
-with open(index_path, "w", encoding="utf-8") as f:
-    f.write(updated_index_js_with_logging)
-
-index_path
+  app.listen(PORT, () => {
+    console.log(`讚美小天使 listening on port ${PORT}`);
+  });
